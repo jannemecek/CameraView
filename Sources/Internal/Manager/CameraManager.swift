@@ -210,7 +210,12 @@ extension CameraManager {
     func setCameraFocus(at touchPoint: CGPoint) throws {
         guard let device = getCameraInput()?.device, !isChanging else { return }
 
-        let focusPoint = convertTouchPointToFocusPoint(touchPoint)
+        // let focusPoint = convertTouchPointToFocusPoint(touchPoint)
+        let screenWidth: CGFloat = UIScreen.main.bounds.size.width
+        let screenHeight: CGFloat = UIScreen.main.bounds.size.height 
+        - (UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.top ?? 0)
+        let focusPoint: CGPoint = CGPoint(x: touchPoint.x/screenWidth, 
+                                          y: touchPoint.y/screenHeight)
         try setDeviceCameraFocus(focusPoint, device)
         cameraMetalView.performCameraFocusAnimation(touchPoint: touchPoint)
     }
