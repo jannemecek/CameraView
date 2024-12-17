@@ -41,7 +41,7 @@ import AVKit
         self.frontCameraInput = CDI.get(mediaType: .video, position: .front)
         self.backCameraInput = CDI.get(mediaType: .video, position: .back)
         if let backCameraInput = backCameraInput as? AVCaptureDeviceInput {
-            self.attributes = .init(zoomFactor: backCameraInput.defaultZoomLevel)
+            self.attributes = .init(zoomFactor: min(2, backCameraInput.defaultZoomLevel))
         } else {
             self.attributes = .init()
         }
