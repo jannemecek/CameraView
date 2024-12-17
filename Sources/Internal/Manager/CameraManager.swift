@@ -13,7 +13,7 @@ import SwiftUI
 import AVKit
 
 @MainActor public class CameraManager: NSObject, ObservableObject {
-    @Published var attributes: CameraManagerAttributes = .init()
+    @Published var attributes: CameraManagerAttributes
 
     // MARK: Input
     private(set) var captureSession: any CaptureSession
@@ -40,6 +40,11 @@ import AVKit
         self.captureSession = captureSession
         self.frontCameraInput = CDI.get(mediaType: .video, position: .front)
         self.backCameraInput = CDI.get(mediaType: .video, position: .back)
+        if let backCameraInput = backCameraInput as? AVCaptureDeviceInput {
+            self.attributes = .init(zoomFactor: backCameraInput.defaultZoomLevel)
+        } else {
+            self.attributes = .init()
+        }
     }
 }
 

@@ -19,10 +19,10 @@ extension AVCaptureDeviceInput: CaptureDeviceInput {
                 return AVCaptureDevice.default(for: .audio)
             case .video where position == .front:
                 let devices = videoDeviceType(mediaType: mediaType, position: position!)
-                return AVCaptureDevice.default(devices.first ?? .builtInWideAngleCamera, for: .video, position: .front)
+                return devices.first ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
             case .video where position == .back:
                 let devices = videoDeviceType(mediaType: mediaType, position: position!)
-                return AVCaptureDevice.default(devices.first ?? .builtInWideAngleCamera, for: .video, position: .back)
+                return devices.first ?? AVCaptureDevice.default(for: .video)
             default:
                 fatalError()
             }
@@ -32,7 +32,16 @@ extension AVCaptureDeviceInput: CaptureDeviceInput {
         return deviceInput
     }
     
-    private static func videoDeviceType(mediaType: AVMediaType, position: AVCaptureDevice.Position) -> [AVCaptureDevice.DeviceType] {
+    var defaultZoomLevel: CGFloat {
+        if #available(iOS 18.0, *) {
+            if device.displayVideoZoomFactorMultiplier != 1.0 {
+                return device.videoZoomFactor/device.displayVideoZoomFactorMultiplier
+            }
+        }
+        return 1
+    }
+    
+    private static func videoDeviceType(mediaType: AVMediaType, position: AVCaptureDevice.Position) -> [AVCaptureDevice] {
         let discoverySession = AVCaptureDevice.DiscoverySession(
             // TODO: Extract preferred device types to be a public API
             deviceTypes: [.builtInTripleCamera, .builtInDualCamera, .builtInWideAngleCamera],
@@ -45,6 +54,6 @@ extension AVCaptureDeviceInput: CaptureDeviceInput {
         for device in devices {
             print("Device name: \(device.localizedName)")
         }
-        return devices.map { $0.deviceType }
+        return devices
     }
 }
